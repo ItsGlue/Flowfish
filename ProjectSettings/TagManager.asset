@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - fish
+  - fishfood
+  - Plant
+  - ground
+  - FishTankTrigger
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - fishtank
+  - Water
+  - UI
+  - fishfood
+  - groundLayer
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Background
+    uniqueID: 3015982373
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0

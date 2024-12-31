@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Calendar.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Notes.unity
+    guid: e2f52701ef5b74c97b758e65cbd53500
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: fcb7827e22a5b451a8de0d11bc074bf4
+  - enabled: 1
+    path: Assets/Scenes/Shop.unity
+    guid: f5bd630c8f4fe4feea5db4ae8a6e7e6c
+  - enabled: 1
+    path: Assets/Scenes/Homepage.unity
+    guid: 2c271bdd8a32e470dadd25680de2d0fb
+  m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
