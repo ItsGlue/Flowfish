@@ -3,13 +3,13 @@ using UnityEngine.UI;
 
 public class ButtonScrolling : MonoBehaviour
 {
-    public Button[] buttons; // Array to hold the buttons (e.g., 3 buttons per set)
-    public Button leftArrowButton; // Reference to the left arrow button ("<")
-    public Button rightArrowButton; // Reference to the right arrow button (">")
+    public Button[] buttons; 
+    public Button leftArrowButton;
+    public Button rightArrowButton;
 
-    public Sprite[] buttonImages; // Array of sprites for the button images
-    private int currentSetIndex = 0; // Tracks which set of buttons is being shown
-    private int buttonsPerSet; // Number of buttons per set (e.g., 3)
+    public Sprite[] buttonImages;
+    private int currentSetIndex = 0;
+    private int buttonsPerSet;
     
     void Start()
     {

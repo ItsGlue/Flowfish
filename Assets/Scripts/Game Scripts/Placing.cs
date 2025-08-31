@@ -5,85 +5,94 @@ using TMPro;
 
 public class Placing : MonoBehaviour
 {
-    public Button button; // Reference to the button in the UI
-    public Image buttonImage; // Reference to the button's Image component
+    [Header("UI References")]
+    public Button button;
+    public Image buttonImage;
 
-    // Map each sprite (image) to a corresponding prefab
-    public Sprite[] buttonSprites; // Array of button images (states)
-    public GameObject[] prefabs;   // Array of prefabs corresponding to each button image
+    [Header("Prefab/Data Settings")]
+    public Sprite[] buttonSprites;
+    public GameObject[] prefabs;
 
-    private GameObject spawnedObject;  // Reference to the spawned object
-    public bool isPlacingObject = false; // Flag to check if we are placing an object
+    private GameObject spawnedObject;
+    private bool isPlacingObject = false;
+    private int currentPrefabIndex = -1;
+
+    private SaveManager persistenceManager;
+
+    private void Awake()
+    {
+        persistenceManager = FindFirstObjectByType<SaveManager>();
+
+        if (persistenceManager == null)
+        {
+            Debug.LogError("No ObjectPersistenceManager found in the scene. Make sure one exists!");
+        }
+    }
 
     void Update()
     {
-        // If we are placing an object, make it follow the mouse
         if (isPlacingObject && spawnedObject != null)
         {
             Vector3 mousePosition = Input.mousePosition;
-            mousePosition.z = Camera.main.nearClipPlane; // Set z position based on the camera's near clip plane
+            mousePosition.z = Camera.main.nearClipPlane;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            worldPosition.z = 0; // Ensure it's on the same plane for 2D
+            worldPosition.z = 0;
 
             spawnedObject.transform.position = worldPosition;
-
-            // Place the object when the left mouse button is clicked
             if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
             {
-                isPlacingObject = false; // Stop moving the object
-
-                // After the object is placed, add it to the save list
-
+                isPlacingObject = false;
+                if (currentPrefabIndex >= 0 && currentPrefabIndex < prefabs.Length)
+                {
+                    GameObject prefabToPlace = prefabs[currentPrefabIndex];
+                    Vector3 finalPosition = spawnedObject.transform.position;
+                    Quaternion finalRotation = spawnedObject.transform.rotation;
+                    Vector3 finalScale = spawnedObject.transform.localScale;
+                    Destroy(spawnedObject);
+                    persistenceManager.PlaceObject(prefabToPlace, finalPosition, finalRotation, finalScale);
+                }
+                currentPrefabIndex = -1;
             }
         }
-
-        Sprite currentSprite = buttonImage.sprite;
-
         if (buttonImage != null)
         {
+            Sprite currentSprite = buttonImage.sprite;
             for (int i = 0; i < buttonSprites.Length; i++)
             {
                 if (currentSprite == buttonSprites[i])
                 {
                     TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
-                    if (buttonText != null)
+                    if (buttonText != null && InventoryManager.instance != null)
                     {
-                        if (InventoryManager.instance != null)
-                        {
                         int quantity = InventoryManager.instance.GetItemQuantity(prefabs[i].name);
                         buttonText.text = quantity.ToString();
-                        }
                     }
-                    break; 
+                    break;
                 }
             }
         }
-
     }
-
-    // This method will be called by the button to spawn the object based on the button's current state (image)
     public void SpawnObjectByButtonState()
     {
-        // Get the current sprite on the button
+        if (persistenceManager == null)
+        {
+            Debug.LogError("ObjectPersistenceManager reference is missing!");
+            return;
+        }
         Sprite currentSprite = buttonImage.sprite;
-
-        // Find the corresponding prefab for the current sprite
         for (int i = 0; i < buttonSprites.Length; i++)
         {
             if (currentSprite == buttonSprites[i])
             {
-                // Spawn the prefab that matches the current sprite
                 if (InventoryManager.instance.GetItemQuantity(prefabs[i].name) > 0) 
                 {
                     if (!isPlacingObject)
                     {
-                        // Remove item from inventory
                         InventoryManager.instance.RemoveItem(prefabs[i].name);
-                        
-                        // Instantiate the object
+                        currentPrefabIndex = i;
                         spawnedObject = Instantiate(prefabs[i]);
+                        MakeObjectTransparent(spawnedObject);
                         
-                        // Now we are placing the object
                         isPlacingObject = true;
                         break;
                     }
@@ -91,8 +100,30 @@ public class Placing : MonoBehaviour
             }
         }
     }
+    private void MakeObjectTransparent(GameObject obj)
+    {
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            Material[] materials = renderer.materials;
+            for (int i = 0; i < materials.Length; i++)
+            {
+                Color color = materials[i].color;
+                color.a = 0.7f;
+                materials[i].color = color;
+                materials[i].SetFloat("_Mode", 3);
+                materials[i].SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                materials[i].SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                materials[i].SetInt("_ZWrite", 0);
+                materials[i].DisableKeyword("_ALPHATEST_ON");
+                materials[i].EnableKeyword("_ALPHABLEND_ON");
+                materials[i].DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                materials[i].renderQueue = 3000;
+            }
+            renderer.materials = materials;
+        }
+    }
 
-    // Check if the mouse is over a UI element to avoid placing the object when clicking UI
     private bool IsPointerOverUI()
     {
         return EventSystem.current.IsPointerOverGameObject();

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; // Required to access SceneManager
 
 public class UpdateSpriteFromSource : MonoBehaviour
 {
@@ -7,30 +8,37 @@ public class UpdateSpriteFromSource : MonoBehaviour
 
     private SpriteRenderer sourceSpriteRenderer;
     private SpriteRenderer targetSpriteRenderer;
-    private Sprite previousSprite;   
+    private Sprite previousSprite;
 
     void Start()
     {
+        if (SceneManager.GetActiveScene().name != "Game")
+        {
+            
+            enabled = false;
+            return;
+        }
+
         sourceSpriteRenderer = sourceObject.GetComponent<SpriteRenderer>();
         targetSpriteRenderer = targetObject.GetComponent<SpriteRenderer>();
 
         if (sourceSpriteRenderer == null || targetSpriteRenderer == null)
         {
-            Debug.LogError("One of the objects is missing a SpriteRenderer component!");
             return;
         }
 
         previousSprite = sourceSpriteRenderer.sprite;
-
         targetSpriteRenderer.sprite = previousSprite;
     }
 
     void Update()
     {
+        if (SceneManager.GetActiveScene().name != "Game") return;
+
         if (sourceSpriteRenderer.sprite != previousSprite)
         {
-            previousSprite = sourceSpriteRenderer.sprite;  
-            targetSpriteRenderer.sprite = previousSprite;  
+            previousSprite = sourceSpriteRenderer.sprite;
+            targetSpriteRenderer.sprite = previousSprite;
         }
     }
 }

@@ -7,7 +7,6 @@ public class BuyScript : MonoBehaviour
     public int cost; 
     public string itemName; 
 
-    //called on button press
     public void onClick() {
         if (cost <= MoneyManager.instance.GetMoney()) {
             MoneyManager.instance.SubtractMoney(cost);

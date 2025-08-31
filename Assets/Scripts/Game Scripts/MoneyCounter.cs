@@ -7,8 +7,6 @@ public class MoneyCounter : MonoBehaviour
 {
     public TextMeshProUGUI textMeshPro;
     
-
-    // Update is called once per frame
     void Update()
     {
         textMeshPro.text = "Money: $" + MoneyManager.instance.GetMoney().ToString();

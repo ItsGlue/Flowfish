@@ -1,38 +1,30 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI; // For Button and Image
+using UnityEngine.UI;
 
 public class Timer : MonoBehaviour
 {
-    public float timeRemaining;         // The initial time in seconds
-    public TMP_Text timerText;          // Reference to the TMP text to display the timer
-    public Button toggleButton;         // The button to start/pause/resume the timer
-    public Button resetButton;          // The reset button (separate button)
-    public Sprite playSprite;           // Sprite for the play state (paused)
-    public Sprite pauseSprite;          // Sprite for the pause state (running)
+    public float timeRemaining;
+    public TMP_Text timerText;
+    public Button toggleButton;
+    public Button resetButton;
+    public Sprite playSprite;
+    public Sprite pauseSprite;
 
     private bool isTimerRunning = false;
-    private bool isPaused = false;      // To track if the timer is paused
-    private float initialTime;          // Stores the initial time to reset the timer
-    private Image toggleButtonImage;    // The image component of the toggle button
+    private bool isPaused = false;
+    private float initialTime;
+    private Image toggleButtonImage;
+
+    private float timeElapsed = 0f;
 
     void Start()
     {
-        // Store the initial time when the timer is started
         initialTime = timeRemaining;
-
-        // Get the button's image component
         toggleButtonImage = toggleButton.GetComponent<Image>();
-
-        // Set the initial timer display
         UpdateTimerDisplay(timeRemaining);
-
-        // Set the initial button sprite to play (paused)
         toggleButtonImage.sprite = playSprite;
-
-        // Hook up the reset button directly (optional)
         resetButton.onClick.AddListener(ResetTimer);
-
         timerText.alignment = TextAlignmentOptions.Center;
     }
 
@@ -42,70 +34,70 @@ public class Timer : MonoBehaviour
         {
             if (timeRemaining > 0)
             {
-                timeRemaining -= Time.deltaTime;
-
-                // Clamp timeRemaining to 0 to prevent going negative
+                float delta = Time.deltaTime;
+                timeRemaining -= delta;
+                timeElapsed += delta;
                 if (timeRemaining < 0)
                 {
                     timeRemaining = 0;
-                    MoneyManager.instance.AddMoney(25);
                 }
 
                 UpdateTimerDisplay(timeRemaining);
             }
             else
             {
-                // Stop the timer and ensure it's clamped at 0
                 timeRemaining = 0;
                 isTimerRunning = false;
                 UpdateTimerDisplay(timeRemaining);
-                toggleButtonImage.sprite = playSprite; // Set button to play when timer finishes
-                
+                TimeTrackingManager.Instance.AddTimeForToday(timeElapsed);
+                Debug.Log($"Timer ended. Elapsed time: {timeElapsed:F2} seconds");
+                toggleButtonImage.sprite = playSprite;
+                MoneyManager.instance.AddMoney(25);
+                timeElapsed = 0f;
             }
         }
-
     }
 
-
-    // Toggle between starting, pausing, and resuming the timer
     public void ToggleTimer()
     {
         if (!isTimerRunning)
         {
-            if (timeRemaining > 0) {
-                // Start the timer if it hasn't started yet
+            if (timeRemaining > 0)
+            {
                 isTimerRunning = true;
                 isPaused = false;
-                toggleButtonImage.sprite = pauseSprite; // Change to pause icon
+                toggleButtonImage.sprite = pauseSprite; 
             }
         }
         else if (isPaused)
         {
-            if (timeRemaining > 0) {
-                // Resume the timer if it's paused
+            if (timeRemaining > 0)
+            {
                 isPaused = false;
-                toggleButtonImage.sprite = pauseSprite; // Change to pause icon
+                toggleButtonImage.sprite = pauseSprite;
             }
         }
         else
         {
-            // Pause the timer if it's running
             isPaused = true;
-            toggleButtonImage.sprite = playSprite; // Change to play icon
+            toggleButtonImage.sprite = playSprite;
+            TimeTrackingManager.Instance.AddTimeForToday(timeElapsed);
+            Debug.Log($"Timer paused. Elapsed time: {timeElapsed:F2} seconds");
         }
     }
 
-    // Reset the timer to the initial value
     public void ResetTimer()
     {
+        TimeTrackingManager.Instance.AddTimeForToday(timeElapsed);
+        Debug.Log($"Timer reset. Elapsed time: {timeElapsed:F2} seconds");
         timeRemaining = initialTime;
+        timeElapsed = 0f;
         isPaused = false;
-        isTimerRunning = true; // Resume the timer after resetting
-        UpdateTimerDisplay(timeRemaining);  // Update the display immediately after reset
-        toggleButtonImage.sprite = pauseSprite;   // Set toggle button to pause when reset
+        isTimerRunning = true;
+        toggleButtonImage.sprite = pauseSprite;
+        UpdateTimerDisplay(timeRemaining);
     }
 
-    // Update the text display for the timer
     private void UpdateTimerDisplay(float time)
     {
         int minutes = Mathf.FloorToInt(time / 60);

@@ -1,29 +1,34 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Make sure to include this for TMP
+using TMPro;
 
 public class FishChanger : MonoBehaviour
 {
-    public SpriteRenderer targetSpriteRenderer;  // GameObject's SpriteRenderer component
-    public Sprite[] spriteList;                  // Array of sprites to scroll through
-    public string[] spriteDescriptions;           // Array of strings corresponding to each sprite
-    public Button nextButton;                    // Button to go to the next sprite
-    public Button prevButton;                    // Button to go to the previous sprite
-    public TextMeshProUGUI descriptionText;      // TMP object to display the string
+    private const string SELECTED_FISH_INDEX_KEY = "SelectedFishIndex";
+
+    public SpriteRenderer targetSpriteRenderer;
+    public Sprite[] spriteList;
+    public string[] spriteDescriptions;
+    public Button nextButton;
+    public Button prevButton;
+    public TextMeshProUGUI descriptionText;
 
     private int currentSpriteIndex = 0;
 
     void Start()
     {
+        currentSpriteIndex = PlayerPrefs.GetInt(SELECTED_FISH_INDEX_KEY, 0);
+        if (currentSpriteIndex < 0 || currentSpriteIndex >= spriteList.Length)
+        {
+            currentSpriteIndex = 0;
+        }
         if (spriteList.Length > 0)
         {
             targetSpriteRenderer.sprite = spriteList[currentSpriteIndex];
             UpdateDescription();
         }
-
         nextButton.onClick.AddListener(NextSprite);
         prevButton.onClick.AddListener(PreviousSprite);
-
         UpdateButtonStates();
     }
 
@@ -34,6 +39,8 @@ public class FishChanger : MonoBehaviour
             currentSpriteIndex++;
             targetSpriteRenderer.sprite = spriteList[currentSpriteIndex];
             UpdateDescription();
+            PlayerPrefs.SetInt(SELECTED_FISH_INDEX_KEY, currentSpriteIndex);
+            PlayerPrefs.Save();
         }
 
         UpdateButtonStates();
@@ -46,6 +53,8 @@ public class FishChanger : MonoBehaviour
             currentSpriteIndex--;
             targetSpriteRenderer.sprite = spriteList[currentSpriteIndex];
             UpdateDescription();
+            PlayerPrefs.SetInt(SELECTED_FISH_INDEX_KEY, currentSpriteIndex);
+            PlayerPrefs.Save();
         }
 
         UpdateButtonStates();
@@ -62,6 +71,10 @@ public class FishChanger : MonoBehaviour
         if (currentSpriteIndex < spriteDescriptions.Length)
         {
             descriptionText.text = spriteDescriptions[currentSpriteIndex];
+        }
+        else
+        {
+            descriptionText.text = string.Empty;
         }
     }
 }

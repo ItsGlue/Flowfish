@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class FoodButton : MonoBehaviour
 {
-    public GameObject prefabToSpawn; // Assign the prefab in the Inspector
-    public Transform spawnLocation;  // Optionally assign a spawn location
+    public GameObject prefabToSpawn;
+    public Transform spawnLocation;
 
    
 
     void OnMouseOver()  
 	{
-		if (Input.GetMouseButtonDown(0)) // Check if the left mouse button is pressed
+		if (Input.GetMouseButtonDown(0))
         {
             SpawnPrefab();
         }
