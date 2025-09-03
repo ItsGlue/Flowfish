@@ -1,5 +1,5 @@
 # FLOWFISH  
-*A fun and personalizable productivity app!*  
+*A fun and personalizable pomodoro timer!*  
 
 | Home Screen | Features | Customization |
 |-------------|----------|---------------|
