@@ -1,5 +1,5 @@
 # FLOWFISH  
-*A fun and personalizable productivity tracker and pomodoro timer!*  
+*A fun productivity tracker and pomodoro timer!*  
 
 | Home Screen | Features | Customization |
 |-------------|----------|---------------|
